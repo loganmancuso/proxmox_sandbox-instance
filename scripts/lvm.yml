@@ -1,0 +1,22 @@
+---
+- hosts: manager, workers
+  tasks:
+  - name: Extend an existing partition to fill all available space
+    become: true
+    ansible.builtin.shell: growpart /dev/vda 3
+    run_once: true
+
+  - name: Resize the partition
+    become: true
+    ansible.builtin.shell: pvresize /dev/vda3
+    run_once: true
+
+  - name: Extend the lvm partition
+    become: true
+    ansible.builtin.shell: lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+    run_once: true
+
+  - name: Extend the file system
+    become: true
+    ansible.builtin.shell: resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+    run_once: true

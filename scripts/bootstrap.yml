@@ -1,0 +1,80 @@
+---
+- hosts: thoth
+  tasks:
+  - name: Create portainer data directory
+    ansible.builtin.file:
+      path: /mnt/local/container_data/portainer/data
+      state: directory
+      mode: 0777
+      recurse: true
+
+- hosts: manager
+  tasks:
+
+  - name: Upgrade All APT Packages
+    become: true
+    apt: upgrade=dist force_apt_get=true
+
+  - name: Copy swarm helper script
+    become: true
+    ansible.builtin.copy:
+      src: helper/swarm-helper.sh
+      dest: /opt/swarm-helper.sh
+      owner: root
+      group: root
+      mode: '700'
+
+  - name: Init a new swarm with default parameters
+    become: true
+    docker_swarm:
+      state: present
+    register: result
+    when: inventory_hostname == groups.manager[0]
+
+  - name: Get join-token for manager nodes
+    set_fact:
+      join_token_manager: "{{ hostvars[groups['manager'][0]].result.swarm_facts.JoinTokens.Manager }}"
+      register: join_token_manager
+
+  - name: Get join-token for worker nodes
+    set_fact:
+      join_token_worker: "{{ hostvars[groups['manager'][0]].result.swarm_facts.JoinTokens.Worker }}"
+      register: join_token_worker
+
+  - debug:
+      var: join_token_manager
+
+  - debug:
+      var: join_token_worker
+
+  - name: Get updated files from git repository
+    become: true
+    git: repo=https://loganmancuso:glpat-Vh1eyszzD3hz6qvMVUmU@gitlab.com/loganmancuso_infrastructure/proxmox/apps.git dest=/opt/apps
+
+  - name: Deploy portainer stack from file
+    become: true
+    docker_stack:
+      state: present
+      name: portainer
+      compose:
+        - /opt/apps/portainer.docker-stack.yml
+
+- hosts: workers
+  tasks:
+  - name: Upgrade All APT Packages
+    become: true
+    apt: upgrade=dist force_apt_get=true
+
+  - debug:
+      var: hostvars[groups['manager'][0]].join_token_worker
+
+  - debug:
+      var: hostvars[groups['manager'][0]].inventory_hostname
+
+  - name: Join workers
+    become: true
+    community.general.docker_swarm:
+      state: join
+      join_token: "{{ hostvars[groups['manager'][0]].join_token_worker }}"
+      advertise_addr: "{{ ansible_host }}"
+      remote_addrs: "{{ hostvars[groups['manager'][0]].inventory_hostname }}"
