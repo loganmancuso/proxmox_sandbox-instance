@@ -14,10 +14,11 @@ terraform {
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
-      version = ">= 0.29.0"
+      version = ">= 0.30.1"
     }
   }
-  backend "http" {
+  backend "local" {
+    path = "sandbox-instance.tfstate"
   }
 }
 

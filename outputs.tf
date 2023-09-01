@@ -8,7 +8,7 @@
 output "instance" {
   description = "deployed instance"
   value = {
-    name = proxmox_virtual_environment_vm.instance.name,
+    name           = proxmox_virtual_environment_vm.instance.name,
     ipv4_addresses = proxmox_virtual_environment_vm.instance.ipv4_addresses[1][0]
   }
 }

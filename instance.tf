@@ -6,7 +6,7 @@
 ##############################################################################
 
 resource "random_pet" "instance_name" {
-  length   = 3
+  length = 3
 }
 
 resource "proxmox_virtual_environment_vm" "instance" {
@@ -34,7 +34,7 @@ resource "proxmox_virtual_environment_vm" "instance" {
     down_delay = "60"
   }
   clone {
-    vm_id = 9000
+    vm_id = 210
   }
   disk {
     datastore_id = "local-lvm"
@@ -56,7 +56,7 @@ resource "proxmox_virtual_environment_vm" "instance" {
       username = local.instance_credentials["username"]
       password = local.instance_credentials["password"]
     }
-
+    user_data_file_id = proxmox_virtual_environment_file.bootstrap.id
   }
 
   network_device {
@@ -69,4 +69,32 @@ resource "proxmox_virtual_environment_vm" "instance" {
   }
 
   serial_device {}
+}
+
+# Bootstrap
+resource "proxmox_virtual_environment_file" "bootstrap" {
+  content_type = "snippets"
+  datastore_id = "local"
+  node_name    = "pve-master"
+  source_raw {
+    data = <<EOF
+#cloud-config
+hostname: i-${random_pet.instance_name.id}
+packages:
+  - qemu-guest-agent
+users:
+  - name: ${local.instance_credentials["username"]}
+    groups: sudo
+    shell: /bin/bash 
+    ssh-authorized-keys:
+      - ${trimspace(local.instance_credentials["key"])}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+runcmd:
+  - growpart /dev/vda 3
+  - pvresize /dev/vda3
+  - lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+  - resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+EOF
+    file_name = "i-${random_pet.instance_name.id}.bootstrap.yml"
+  }
 }
