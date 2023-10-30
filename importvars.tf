@@ -8,7 +8,7 @@
 data "terraform_remote_state" "datacenter_infrastructure" {
   backend = "local"
   config = {
-    path = "../datacenter-infrastructure/terraform.tfstate.d/${terraform.workspace}/terraform.tfstate"
+    path = "../datacenter-infrastructure/terraform.tfstate.d/prod/terraform.tfstate"
   }
 }
 

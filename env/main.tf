@@ -17,7 +17,13 @@ terraform {
       version = ">= 0.29.0"
     }
   }
-  backend "local" {}
+
+  backend "http" {
+    address = "https://gitlab.com/api/v4/projects/48941316/terraform/state/sandbox-instance"
+    username = "loganmancuso"
+    password = "glpat-TqaJPh8C3EcuEeDSM_zF"
+  }
+
 }
 
 provider "proxmox" {
