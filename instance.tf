@@ -5,30 +5,27 @@
 #
 ##############################################################################
 
-resource "random_pet" "manager_name" {
-  length = 3
-}
-
 locals {
-  manager_vm_id              = 20110
-  deployed_node      = "pve-manager"
-  manager_ip_addr            = "192.168.10.10/24"
+  vm_id         = 20999
+  deployed_node = "pve-manager"
+  vm_name       = "test-instance"
+  ip_addr       = "192.168.10.240/24"
 }
 
-resource "proxmox_virtual_environment_vm" "manager" {
+resource "proxmox_virtual_environment_vm" "test_instance" {
   # Instance Description
-  name        = random_pet.manager_name.id
-  description = "# Manager Server \n## ${random_pet.manager_name.id}"
-  tags        = ["k8"]
+  name        = local.vm_name
+  description = "# Test Instance \n## ${local.vm_name}"
+  tags        = ["test"]
   node_name   = local.deployed_node
-  vm_id       = local.manager_vm_id
+  vm_id       = local.vm_id
   # Instance Config
   clone {
     vm_id = 100 # Jammy-k8
   }
   on_boot = true
   startup {
-    order      = local.manager_vm_id
+    order      = local.vm_id
     up_delay   = "60"
     down_delay = "60"
   }
@@ -68,7 +65,7 @@ resource "proxmox_virtual_environment_vm" "manager" {
   initialization {
     ip_config {
       ipv4 {
-        address = local.manager_ip_addr
+        address = local.ip_addr
         gateway = "192.168.10.1"
       }
     }
@@ -82,10 +79,10 @@ resource "proxmox_virtual_environment_file" "bootstrap" {
   node_name    = local.deployed_node
 
   source_raw {
-    file_name = "${random_pet.manager_name.id}.cloud-config.yaml"
+    file_name = "${local.vm_name}.cloud-config.yaml"
     data      = <<EOF
 #cloud-config
-hostname: ${random_pet.manager_name.id}.local
+hostname: ${local.vm_name}.local
 users:
   - name: ${local.instance_credentials["username"]}
     primary_group: ${local.instance_credentials["username"]}

@@ -5,15 +5,15 @@
 #
 ##############################################################################
 
-resource "proxmox_virtual_environment_firewall_alias" "manager" {
-  name    = "manager"
-  cidr    = local.manager_ip_addr
-  comment = "manager data server ip"
+resource "proxmox_virtual_environment_firewall_alias" "test" {
+  name    = "test"
+  cidr    = local.ip_addr
+  comment = "test data server ip"
 }
 
-resource "proxmox_virtual_environment_firewall_options" "manager_firewall_policy" {
+resource "proxmox_virtual_environment_firewall_options" "test_firewall_policy" {
   node_name     = local.deployed_node
-  vm_id         = local.manager_vm_id
+  vm_id         = local.vm_id
   dhcp          = true
   enabled       = true
   ipfilter      = false
@@ -24,12 +24,12 @@ resource "proxmox_virtual_environment_firewall_options" "manager_firewall_policy
   input_policy  = "DROP"
   output_policy = "ACCEPT"
   radv          = true
-  depends_on    = [proxmox_virtual_environment_vm.manager]
+  depends_on    = [proxmox_virtual_environment_vm.test_instance]
 }
 
-resource "proxmox_virtual_environment_firewall_rules" "manager_default" {
+resource "proxmox_virtual_environment_firewall_rules" "test_default" {
   node_name = local.deployed_node
-  vm_id     = local.manager_vm_id
+  vm_id     = local.vm_id
   ######################
   ### Inbound Rules ###
   ######################
@@ -37,7 +37,7 @@ resource "proxmox_virtual_environment_firewall_rules" "manager_default" {
     security_group = local.sg_vmdefault
   }
   rule {
-    security_group = proxmox_virtual_environment_cluster_firewall_security_group.manager.name
+    security_group = proxmox_virtual_environment_cluster_firewall_security_group.test.name
   }
 
   # Default DROP Rule
@@ -50,5 +50,5 @@ resource "proxmox_virtual_environment_firewall_rules" "manager_default" {
   ######################
   ### Outbound Rules ###
   ######################
-  depends_on = [proxmox_virtual_environment_vm.manager]
+  depends_on = [proxmox_virtual_environment_vm.test_instance]
 }

@@ -9,9 +9,9 @@
 #######################################
 # Datacenter Default Rules
 #######################################
-resource "proxmox_virtual_environment_cluster_firewall_security_group" "manager" {
-  name    = "sg-manager"
-  comment = "SG to access Data Resources on manager Server"
+resource "proxmox_virtual_environment_cluster_firewall_security_group" "test" {
+  name    = "sg-test"
+  comment = "SG to access Data Resources on Test Server"
 
   ######################
   ### Inbound Rules ###
@@ -21,10 +21,9 @@ resource "proxmox_virtual_environment_cluster_firewall_security_group" "manager"
   rule {
     type    = "in"
     action  = "ACCEPT"
-    comment = "inbound-permit-private-cockpit"
+    comment = "inbound-permit-private-all"
     source  = "dc/${local.private_network_id}"
-    dest    = "dc/${proxmox_virtual_environment_firewall_alias.manager.id}"
-    dport   = 9090
+    dest    = "dc/${proxmox_virtual_environment_firewall_alias.test.id}"
     proto   = "tcp"
     log     = "alert"
   }
