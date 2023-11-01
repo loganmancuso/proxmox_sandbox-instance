@@ -10,8 +10,8 @@
 # Datacenter Default Rules
 #######################################
 resource "proxmox_virtual_environment_cluster_firewall_security_group" "test" {
-  name    = "sg-test"
-  comment = "SG to access Data Resources on Test Server"
+  name    = "sg-${local.vm_name}"
+  comment = "SG to access Data Resources on ${local.vm_name}"
 
   ######################
   ### Inbound Rules ###

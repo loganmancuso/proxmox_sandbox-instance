@@ -6,9 +6,9 @@
 ##############################################################################
 
 resource "proxmox_virtual_environment_firewall_alias" "test" {
-  name    = "test"
+  name    = local.vm_name
   cidr    = local.ip_addr
-  comment = "test data server ip"
+  comment = "${local.vm_name} server ip"
 }
 
 resource "proxmox_virtual_environment_firewall_options" "test_firewall_policy" {

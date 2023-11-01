@@ -23,8 +23,6 @@ terraform {
   }
 }
 
-provider "random" {}
-
 provider "proxmox" {
   endpoint = "https://${local.node_ip}:8006/"
   username = "root@pam"
