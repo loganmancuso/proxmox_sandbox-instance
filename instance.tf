@@ -8,7 +8,7 @@
 locals {
   vm_id             = 20999
   vm_name           = "test-instance"
-  ip_addr           = "192.168.10.240/24"
+  ip_addr           = "192.168.10.240"
 }
 
 resource "proxmox_virtual_environment_vm" "test_instance" {
@@ -64,7 +64,7 @@ resource "proxmox_virtual_environment_vm" "test_instance" {
   initialization {
     ip_config {
       ipv4 {
-        address = local.ip_addr
+        address = "${local.ip_addr}/24"
         gateway = "192.168.10.1"
       }
     }
@@ -85,7 +85,7 @@ hostname: ${local.vm_name}.local
 users:
   - name: ${local.instance_username}
     primary_group: ${local.instance_username}
-    password: ${local.instance_password_hashed}
+    password: "${local.instance_password_hashed}"
     lock_passwd: false
     ssh-authorized-keys:
       - ${trimspace(local.instance_ssh_pubkey)}
