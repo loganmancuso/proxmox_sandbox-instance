@@ -6,21 +6,32 @@
 ##############################################################################
 
 data "terraform_remote_state" "datacenter_infrastructure" {
-  backend = "local"
+  backend = "http"
   config = {
-    path = "../datacenter-infrastructure/terraform.tfstate.d/prod/terraform.tfstate"
+    address  = "https://gitlab.com/api/v4/projects/48634510/terraform/state/bytevault"
+    username = "loganmancuso"
+  }
+}
+
+data "terraform_remote_state" "packer_vm_template" {
+  backend = "http"
+  config = {
+    address  = "https://gitlab.com/api/v4/projects/48496137/terraform/state/jammy-2204"
+    username = "loganmancuso"
   }
 }
 
 locals {
-  operations_user          = data.terraform_remote_state.datacenter_infrastructure.outputs.operations_user
-  operations_user_password = data.terraform_remote_state.datacenter_infrastructure.outputs.operations_user_password
-  instance_credentials     = data.terraform_remote_state.datacenter_infrastructure.outputs.instance_credentials
-  available_nodes          = data.terraform_remote_state.datacenter_infrastructure.outputs.available_nodes
-  dc_endpoint              = data.terraform_remote_state.datacenter_infrastructure.outputs.dc_endpoint
-  root_password            = data.terraform_remote_state.datacenter_infrastructure.outputs.root_password
-  private_network_id       = data.terraform_remote_state.datacenter_infrastructure.outputs.private_network_id
-  vpc_network_id           = data.terraform_remote_state.datacenter_infrastructure.outputs.vpc_network_id
-  iot_network_id           = data.terraform_remote_state.datacenter_infrastructure.outputs.iot_network_id
-  sg_vmdefault             = data.terraform_remote_state.datacenter_infrastructure.outputs.sg_vmdefault
+  # datacenter_infrastructure
+  node_name          = data.terraform_remote_state.datacenter_infrastructure.outputs.node_name
+  node_ip            = data.terraform_remote_state.datacenter_infrastructure.outputs.node_ip
+  private_network_id = data.terraform_remote_state.datacenter_infrastructure.outputs.private_network_id
+  vpc_network_id     = data.terraform_remote_state.datacenter_infrastructure.outputs.vpc_network_id
+  iot_network_id     = data.terraform_remote_state.datacenter_infrastructure.outputs.iot_network_id
+  sg_vmdefault       = data.terraform_remote_state.datacenter_infrastructure.outputs.sg_vmdefault
+  # packer_vm_template
+  instance_username        = data.terraform_remote_state.packer_vm_template.outputs.instance_username
+  instance_password_hashed = data.terraform_remote_state.packer_vm_template.outputs.instance_password_hashed
+  instance_ssh_pubkey      = data.terraform_remote_state.packer_vm_template.outputs.instance_ssh_pubkey
+  vm_template_id           = data.terraform_remote_state.packer_vm_template.outputs.vm_template_id
 }

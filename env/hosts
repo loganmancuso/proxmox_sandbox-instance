@@ -1,6 +1,0 @@
-[all:vars]
-ansible_user=root
-ansible_ssh_private_key_file=~/.ssh/id_ed25519
-
-[pve-manager]
-192.168.1.20  

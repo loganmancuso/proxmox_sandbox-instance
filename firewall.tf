@@ -12,7 +12,7 @@ resource "proxmox_virtual_environment_firewall_alias" "test" {
 }
 
 resource "proxmox_virtual_environment_firewall_options" "test_firewall_policy" {
-  node_name     = local.deployed_node
+  node_name     = local.node_name
   vm_id         = local.vm_id
   dhcp          = true
   enabled       = true
@@ -28,7 +28,7 @@ resource "proxmox_virtual_environment_firewall_options" "test_firewall_policy" {
 }
 
 resource "proxmox_virtual_environment_firewall_rules" "test_default" {
-  node_name = local.deployed_node
+  node_name = local.node_name
   vm_id     = local.vm_id
   ######################
   ### Inbound Rules ###
