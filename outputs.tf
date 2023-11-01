@@ -13,7 +13,7 @@ output "instance_details" {
   }
 }
 
-output "instance_details_untaint" {
+output "proxmox_vm_details" {
   value = proxmox_virtual_environment_vm.test_instance
 }
 
