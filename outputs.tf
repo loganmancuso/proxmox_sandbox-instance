@@ -13,10 +13,6 @@ output "instance_details" {
   }
 }
 
-output "proxmox_vm_details" {
-  value = proxmox_virtual_environment_vm.test_instance
-}
-
 output "ssh_connect" {
   value = "ssh ${local.ip_addr}"
 }

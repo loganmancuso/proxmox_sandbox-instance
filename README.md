@@ -5,9 +5,7 @@ This workflow deploys a test instance on proxmox, it depends on the existing tem
 ## Usage
 to deploy this workflow link the environment tfvars folder to the root directory. 
 ```
-  ln -s env/main.tf
-  ln -s env/terraform.tfvars
-
+  ln -s env/* .
   tofu init .
   tofu plan
   tofu apply
