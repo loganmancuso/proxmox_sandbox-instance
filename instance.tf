@@ -115,6 +115,6 @@ resource "null_resource" "bootstrap_instance" {
     bootstrap_file = "${md5(file("${path.module}/scripts/bootstrap.py"))}"
   }
   provisioner "local-exec" {
-    command = "scp -C ${path.module}/scripts/bootstrap.py ${local.secret_instance_credentials.username}@${local.ip_addr}:/opt/tofu/bootstrap.py && ssh -t ${local.secret_instance_credentials.username}@${local.ip_addr} 'cloud-init status --wait && python3 /opt/tofu/bootstrap.py'"
+    command = "scp -C ${path.module}/scripts/bootstrap.py ${local.secret_instance_credentials.username}@${local.ip_addr}:/opt/tofu/ && ssh -t ${local.secret_instance_credentials.username}@${local.ip_addr} 'cloud-init status --wait && python3 /opt/tofu/bootstrap.py'"
   }
 }
