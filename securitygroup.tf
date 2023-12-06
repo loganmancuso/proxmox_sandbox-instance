@@ -11,7 +11,7 @@
 #######################################
 resource "proxmox_virtual_environment_cluster_firewall_security_group" "test" {
   name    = "sg-${local.vm_name}"
-  comment = "SG to access Data Resources on ${local.vm_name}"
+  comment = "SG to access resources on ${local.vm_name}"
 
   ######################
   ### Inbound Rules ###

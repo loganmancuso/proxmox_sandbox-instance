@@ -88,9 +88,6 @@ resource "proxmox_virtual_environment_vm" "test_instance" {
       host        = local.ip_addr
     }
   }
-  lifecycle {
-    replace_triggered_by = [  ]
-  }
 }
 
 resource "proxmox_virtual_environment_file" "bootstrap" {
@@ -130,7 +127,7 @@ EOF
 }
 
 resource "null_resource" "bootstrap_instance" {
-  depends_on = [proxmox_virtual_environment_vm.test_instance]
+  depends_on = [ proxmox_virtual_environment_vm.test_instance ]
   triggers = {
     bootstrap_file = "${md5(file("${local.bootstrap_src}"))}"
   }

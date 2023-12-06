@@ -8,7 +8,7 @@
 resource "proxmox_virtual_environment_firewall_alias" "test" {
   name    = local.vm_name
   cidr    = "${local.ip_addr}/24"
-  comment = "${local.vm_name} server ip"
+  comment = "${local.vm_name} instance ip"
 }
 
 
