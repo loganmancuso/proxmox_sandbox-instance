@@ -40,15 +40,16 @@ data "terraform_remote_state" "vault_infrastructure" {
 
 locals {
   # datacenter_infrastructure
-  node_name          = data.terraform_remote_state.datacenter_infrastructure.outputs.node_name
-  node_ip            = data.terraform_remote_state.datacenter_infrastructure.outputs.node_ip
-  private_network_id = data.terraform_remote_state.datacenter_infrastructure.outputs.private_network_id
-  vpc_network_id     = data.terraform_remote_state.datacenter_infrastructure.outputs.vpc_network_id
-  iot_network_id     = data.terraform_remote_state.datacenter_infrastructure.outputs.iot_network_id
-  sg_vmdefault       = data.terraform_remote_state.datacenter_infrastructure.outputs.sg_vmdefault
+  node_name              = data.terraform_remote_state.datacenter_infrastructure.outputs.node_name
+  node_ip                = data.terraform_remote_state.datacenter_infrastructure.outputs.node_ip
+  private_network_id     = data.terraform_remote_state.datacenter_infrastructure.outputs.private_network_id
+  vpc_network_id         = data.terraform_remote_state.datacenter_infrastructure.outputs.vpc_network_id
+  iot_network_id         = data.terraform_remote_state.datacenter_infrastructure.outputs.iot_network_id
+  sg_vmdefault           = data.terraform_remote_state.datacenter_infrastructure.outputs.sg_vmdefault
+  vpc_gateway_network_ip = data.terraform_remote_state.datacenter_infrastructure.outputs.vpc_gateway_network_ip
   # packer_vm_template
-  vm_template_id           = data.terraform_remote_state.packer_vm_template.outputs.vm_template_id
-  default_tags             = data.terraform_remote_state.packer_vm_template.outputs.default_tags
+  vm_template_id = data.terraform_remote_state.packer_vm_template.outputs.vm_template_id
+  default_tags   = data.terraform_remote_state.packer_vm_template.outputs.default_tags
   # global_secrets
   vault_shared_instance_credentials = data.terraform_remote_state.global_secrets.outputs.vault_shared_instance_credentials
   # vault_infrastructure

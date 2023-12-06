@@ -6,9 +6,12 @@
 ##############################################################################
 
 locals {
-  vm_id   = 20999
-  vm_name = "test-instance"
-  ip_addr = "192.168.10.240"
+  vm_id            = 20999
+  vm_name          = "test-instance"
+  ip_addr          = "192.168.10.240"
+  bootstrap_src    = "${path.module}/scripts/bootstrap.sh"
+  bootstrap_dst    = "/opt/tofu/bootstrap.sh"
+  bootstrap_cmd    = "ssh -t ${local.secret_instance_credentials.username}@${local.ip_addr} 'chmod u+x,g+x ${local.bootstrap_dst} && ${local.bootstrap_dst}'"
 }
 
 resource "proxmox_virtual_environment_vm" "test_instance" {
@@ -38,11 +41,11 @@ resource "proxmox_virtual_environment_vm" "test_instance" {
   # Instance Hardware
   cpu {
     architecture = "x86_64"
-    cores        = 4
+    cores        = 1
     type         = "x86-64-v2-AES"
   }
   memory {
-    dedicated = 4096
+    dedicated = 1025
   }
   vga {
     type = "qxl"
@@ -65,10 +68,28 @@ resource "proxmox_virtual_environment_vm" "test_instance" {
     ip_config {
       ipv4 {
         address = "${local.ip_addr}/24"
-        gateway = "192.168.10.1"
+        gateway = local.vpc_gateway_network_ip
       }
     }
     user_data_file_id = proxmox_virtual_environment_file.bootstrap.id
+  }
+  provisioner "file" {
+    when        = create
+    content     = templatefile(local.bootstrap_src,
+      {
+        log_dst = "/var/log/tofu/bootstrap.log"
+      }
+    )
+    destination = local.bootstrap_dst
+    connection {
+      type        = "ssh"
+      user        = local.secret_instance_credentials.username
+      private_key = file("~/.ssh/id_ed25519")
+      host        = local.ip_addr
+    }
+  }
+  lifecycle {
+    replace_triggered_by = [  ]
   }
 }
 
@@ -99,12 +120,11 @@ packages:
   - curl
   - unzip
 runcmd:
-  - [ sh, -c, "echo $(date) ': Starting Bootstrap'" ]
+  - [ sh, -c, "echo $(date) ': Resizing LVM'" ]
   - [ sh, -c, growpart /dev/vda 3 ]
   - [ sh, -c, pvresize /dev/vda3 ]
   - [ sh, -c, lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv ]
   - [ sh, -c, resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv ]
-  - [ sh, -c, pip install psutil ]
 EOF
   }
 }
@@ -112,9 +132,9 @@ EOF
 resource "null_resource" "bootstrap_instance" {
   depends_on = [proxmox_virtual_environment_vm.test_instance]
   triggers = {
-    bootstrap_file = "${md5(file("${path.module}/scripts/bootstrap.py"))}"
+    bootstrap_file = "${md5(file("${local.bootstrap_src}"))}"
   }
   provisioner "local-exec" {
-    command = "scp -C ${path.module}/scripts/bootstrap.py ${local.secret_instance_credentials.username}@${local.ip_addr}:/opt/tofu/ && ssh -t ${local.secret_instance_credentials.username}@${local.ip_addr} 'cloud-init status --wait && python3 /opt/tofu/bootstrap.py'"
+    command = local.bootstrap_cmd
   }
 }

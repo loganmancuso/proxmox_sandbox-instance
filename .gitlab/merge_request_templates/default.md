@@ -1,7 +1,7 @@
 ---
-mr: #{MR_NUMBER}
+mr: {MR_NUMBER}
 project: {PROJECT_NAME}
-priority: {PRIORITY_LEVEL}
+issues: [{ISSUE}]
 ---
 ## Summary
 

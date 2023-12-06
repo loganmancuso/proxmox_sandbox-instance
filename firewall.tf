@@ -11,6 +11,7 @@ resource "proxmox_virtual_environment_firewall_alias" "test" {
   comment = "${local.vm_name} server ip"
 }
 
+
 resource "proxmox_virtual_environment_firewall_options" "test_firewall_policy" {
   node_name     = local.node_name
   vm_id         = local.vm_id
