@@ -16,3 +16,8 @@ output "instance_details" {
 output "ssh_connect" {
   value = "ssh ${local.ip_addr}"
 }
+
+output "bootstrap_cmd" {
+  description = "command to bootstrap the instance"
+  value       = local.bootstrap_cmd
+}

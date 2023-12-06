@@ -1,5 +1,4 @@
 ---
-issue: #{ISSUE_NUMBER}
 project: {PROJECT_NAME}
 priority: {PRIORITY_LEVEL}
 ---
