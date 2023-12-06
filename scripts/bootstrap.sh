@@ -11,18 +11,19 @@ exec > >(tee -a "${log_dst}") 2>&1
 
 # Function to map arguments to local variables
 function map_arguments() {
-  echo -e "START:\tmap_arguments"
-  local OPTS=$(getopt -o n:v: --long name:,value: -n 'parse-options' -- "$@")
+  OPTS=$(getopt -o p1:p2: --long param1:param2: -- "$@")
   if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
   eval set -- "$OPTS"
   while true; do
     case "$1" in
-      -n | --name ) name="$1"; shift; shift ;;
-      -v | --value ) value="$2"; shift; shift ;;
+      -p1 | --param1 ) PARAM1="$2"; shift ;;
+      -p2 | --param2 ) PARAM2="$2"; shift ;;
       -- ) shift; break ;;
       * ) break ;;
     esac
   done
+  echo "Param 1 $PARAM1"
+  echo "Param 2 $PARAM2"
   echo -e "END:\tmap_arguments"
 }
 
