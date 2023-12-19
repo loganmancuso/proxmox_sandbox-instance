@@ -6,12 +6,12 @@
 ##############################################################################
 
 locals {
-  vm_id            = 20999
-  vm_name          = "test-instance"
-  ip_addr          = "192.168.10.240"
-  bootstrap_src    = "${path.module}/scripts/bootstrap.sh"
-  bootstrap_dst    = "/opt/tofu/bootstrap.sh"
-  bootstrap_cmd    = "ssh -t ${local.secret_instance_credentials.username}@${local.ip_addr} 'chmod u+x,g+x ${local.bootstrap_dst} && ${local.bootstrap_dst}'"
+  vm_id         = 20999
+  vm_name       = "test"
+  ip_addr       = "192.168.10.240"
+  bootstrap_src = "${path.module}/scripts/bootstrap.sh"
+  bootstrap_dst = "/opt/tofu/bootstrap.sh"
+  bootstrap_cmd = "ssh -t ${local.instance_credentials.username}@${local.ip_addr} 'chmod u+x,g+x ${local.bootstrap_dst} && ${local.bootstrap_dst}'"
 }
 
 resource "proxmox_virtual_environment_vm" "test_instance" {
@@ -60,6 +60,7 @@ resource "proxmox_virtual_environment_vm" "test_instance" {
     size         = 32
     interface    = "virtio0"
     file_format  = "raw"
+    discard      = "ignore"
   }
   serial_device {}
 
@@ -74,8 +75,8 @@ resource "proxmox_virtual_environment_vm" "test_instance" {
     user_data_file_id = proxmox_virtual_environment_file.bootstrap.id
   }
   provisioner "file" {
-    when        = create
-    content     = templatefile(local.bootstrap_src,
+    when = create
+    content = templatefile(local.bootstrap_src,
       {
         log_dst = "/var/log/tofu/bootstrap.log"
       }
@@ -83,7 +84,7 @@ resource "proxmox_virtual_environment_vm" "test_instance" {
     destination = local.bootstrap_dst
     connection {
       type        = "ssh"
-      user        = local.secret_instance_credentials.username
+      user        = local.instance_credentials.username
       private_key = file("~/.ssh/id_ed25519")
       host        = local.ip_addr
     }
@@ -101,12 +102,12 @@ resource "proxmox_virtual_environment_file" "bootstrap" {
 #cloud-config
 hostname: ${local.vm_name}.local
 users:
-  - name: ${local.secret_instance_credentials.username}
-    primary_group: ${local.secret_instance_credentials.username}
-    password: "${local.secret_instance_credentials.hashed_password}"
+  - name: ${local.instance_credentials.username}
+    primary_group: ${local.instance_credentials.username}
+    password: "${local.instance_credentials.hashed_password}"
     lock_passwd: false
     ssh-authorized-keys:
-      - ${trimspace(local.secret_instance_credentials.pub_key)}
+      - ${trimspace(local.instance_credentials.pub_key)}
     sudo: ALL=(ALL) NOPASSWD:ALL
 package_update: true
 package_upgrade: true
@@ -126,10 +127,23 @@ EOF
   }
 }
 
-resource "null_resource" "bootstrap_instance" {
-  depends_on = [ proxmox_virtual_environment_vm.test_instance ]
-  triggers = {
-    bootstrap_file = "${md5(file("${local.bootstrap_src}"))}"
+resource "terraform_data" "bootstrap_instance" {
+  depends_on       = [proxmox_virtual_environment_vm.test_instance]
+  triggers_replace = [md5(file(local.bootstrap_src))]
+  provisioner "file" {
+    when = create
+    content = templatefile(local.bootstrap_src,
+      {
+        log_dst = "/var/log/tofu/bootstrap.log"
+      }
+    )
+    destination = local.bootstrap_dst
+    connection {
+      type        = "ssh"
+      user        = local.instance_credentials.username
+      private_key = file("~/.ssh/id_ed25519")
+      host        = local.ip_addr
+    }
   }
   provisioner "local-exec" {
     command = local.bootstrap_cmd
