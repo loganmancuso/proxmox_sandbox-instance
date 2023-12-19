@@ -9,7 +9,7 @@
 #######################################
 # Datacenter Default Rules
 #######################################
-resource "proxmox_virtual_environment_cluster_firewall_security_group" "test" {
+resource "proxmox_virtual_environment_cluster_firewall_security_group" "sandbox" {
   name    = "sg-${local.vm_name}"
   comment = "SG to access resources on ${local.vm_name}"
 
@@ -23,7 +23,7 @@ resource "proxmox_virtual_environment_cluster_firewall_security_group" "test" {
     action  = "ACCEPT"
     comment = "inbound-permit-private-all"
     source  = "dc/${local.private_network_id}"
-    dest    = "dc/${proxmox_virtual_environment_firewall_alias.test.id}"
+    dest    = "dc/${proxmox_virtual_environment_firewall_alias.sandbox.id}"
     proto   = "tcp"
     log     = "alert"
   }

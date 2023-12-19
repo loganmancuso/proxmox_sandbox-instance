@@ -7,18 +7,18 @@
 
 locals {
   vm_id         = 20999
-  vm_name       = "test"
+  vm_name       = "sandbox"
   ip_addr       = "192.168.10.240"
   bootstrap_src = "${path.module}/scripts/bootstrap.sh"
   bootstrap_dst = "/opt/tofu/bootstrap.sh"
   bootstrap_cmd = "ssh -t ${local.instance_credentials.username}@${local.ip_addr} 'chmod u+x,g+x ${local.bootstrap_dst} && ${local.bootstrap_dst}'"
 }
 
-resource "proxmox_virtual_environment_vm" "test_instance" {
+resource "proxmox_virtual_environment_vm" "sandbox_instance" {
   # Instance Description
   name        = local.vm_name
-  description = "# Test Instance \n## ${local.vm_name}"
-  tags        = concat(local.default_tags, ["test"])
+  description = "# Sandbox Instance \n## ${local.vm_name}"
+  tags        = concat(local.default_tags, ["sandbox"])
   node_name   = local.node_name
   vm_id       = local.vm_id
   # Instance Config
@@ -128,7 +128,7 @@ EOF
 }
 
 resource "terraform_data" "bootstrap_instance" {
-  depends_on       = [proxmox_virtual_environment_vm.test_instance]
+  depends_on       = [proxmox_virtual_environment_vm.sandbox_instance]
   triggers_replace = [md5(file(local.bootstrap_src))]
   provisioner "file" {
     when = create

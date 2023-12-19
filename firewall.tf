@@ -5,13 +5,13 @@
 #
 ##############################################################################
 
-resource "proxmox_virtual_environment_firewall_alias" "test" {
+resource "proxmox_virtual_environment_firewall_alias" "sandbox" {
   name    = local.vm_name
   cidr    = "${local.ip_addr}/24"
   comment = "${local.vm_name} instance ip"
 }
 
-resource "proxmox_virtual_environment_firewall_options" "test_firewall_policy" {
+resource "proxmox_virtual_environment_firewall_options" "sandbox_firewall_policy" {
   node_name     = local.node_name
   vm_id         = local.vm_id
   dhcp          = true
@@ -24,10 +24,10 @@ resource "proxmox_virtual_environment_firewall_options" "test_firewall_policy" {
   input_policy  = "DROP"
   output_policy = "ACCEPT"
   radv          = true
-  depends_on    = [proxmox_virtual_environment_vm.test_instance]
+  depends_on    = [proxmox_virtual_environment_vm.sandbox_instance]
 }
 
-resource "proxmox_virtual_environment_firewall_rules" "test_default" {
+resource "proxmox_virtual_environment_firewall_rules" "sandbox_default" {
   node_name = local.node_name
   vm_id     = local.vm_id
   ######################
@@ -37,7 +37,7 @@ resource "proxmox_virtual_environment_firewall_rules" "test_default" {
     security_group = local.sg_vmdefault
   }
   rule {
-    security_group = proxmox_virtual_environment_cluster_firewall_security_group.test.name
+    security_group = proxmox_virtual_environment_cluster_firewall_security_group.sandbox.name
   }
 
   # Default DROP Rule
@@ -50,5 +50,5 @@ resource "proxmox_virtual_environment_firewall_rules" "test_default" {
   ######################
   ### Outbound Rules ###
   ######################
-  depends_on = [proxmox_virtual_environment_vm.test_instance]
+  depends_on = [proxmox_virtual_environment_vm.sandbox_instance]
 }
