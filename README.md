@@ -1,11 +1,9 @@
 # Terraform Proxmox
 
-This workflow deploys a test instance on proxmox, it depends on the existing template vm 
+This workflow deploys a test instance on proxmox, it depends on the existing template vm deployed by the packer workflow
 
 ##### Dependancies
-- loganmancuso_infrastructure/applications/hashicorp-vault>
 - loganmancuso_infrastructure/proxmox/datacenter-infrastructure>
-- loganmancuso_infrastructure/proxmox/vault-infrastructure>
 - loganmancuso_infrastructure/proxmox/global-secrets>
 - loganmancuso_infrastructure/proxmox/packer-vm-templates>
 
