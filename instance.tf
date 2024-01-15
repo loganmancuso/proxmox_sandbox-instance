@@ -69,7 +69,7 @@ resource "proxmox_virtual_environment_vm" "sandbox_instance" {
     ip_config {
       ipv4 {
         address = "${local.ip_addr}/24"
-        gateway = local.vpc_gateway_network_ip
+        gateway = local.network_vpc_gateway
       }
     }
     user_data_file_id = proxmox_virtual_environment_file.bootstrap.id

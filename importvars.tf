@@ -32,13 +32,13 @@ data "terraform_remote_state" "global_secrets" {
 
 locals {
   # datacenter_infrastructure
-  node_name              = data.terraform_remote_state.datacenter_infrastructure.outputs.node_name
-  node_ip                = data.terraform_remote_state.datacenter_infrastructure.outputs.node_ip
-  private_network_id     = data.terraform_remote_state.datacenter_infrastructure.outputs.private_network_id
-  vpc_network_id         = data.terraform_remote_state.datacenter_infrastructure.outputs.vpc_network_id
-  iot_network_id         = data.terraform_remote_state.datacenter_infrastructure.outputs.iot_network_id
-  sg_vmdefault           = data.terraform_remote_state.datacenter_infrastructure.outputs.sg_vmdefault
-  vpc_gateway_network_ip = data.terraform_remote_state.datacenter_infrastructure.outputs.vpc_gateway_network_ip
+  node_name           = data.terraform_remote_state.datacenter_infrastructure.outputs.node_name
+  node_ip             = data.terraform_remote_state.datacenter_infrastructure.outputs.node_ip
+  network_private     = data.terraform_remote_state.datacenter_infrastructure.outputs.network_id_private
+  network_vpc         = data.terraform_remote_state.datacenter_infrastructure.outputs.network_id_vpc
+  network_iot         = data.terraform_remote_state.datacenter_infrastructure.outputs.network_id_iot
+  sg_vmdefault        = data.terraform_remote_state.datacenter_infrastructure.outputs.sg_vmdefault
+  network_vpc_gateway = data.terraform_remote_state.datacenter_infrastructure.outputs.network_ip_vpc_gateway
   # packer_vm_template
   vm_template_id = data.terraform_remote_state.packer_vm_template.outputs.vm_template_id
   default_tags   = data.terraform_remote_state.packer_vm_template.outputs.default_tags
