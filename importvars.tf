@@ -43,18 +43,22 @@ locals {
   vm_template_id = data.terraform_remote_state.packer_vm_template.outputs.vm_template_id
   default_tags   = data.terraform_remote_state.packer_vm_template.outputs.default_tags
   # global_secrets
-  secret_instance_credentials = data.terraform_remote_state.global_secrets.outputs.instance_credentials
+  secret_proxmox  = data.terraform_remote_state.global_secrets.outputs.proxmox
+  secret_instance = data.terraform_remote_state.global_secrets.outputs.instance
 }
 
 ## Obtain Vault Secrets ##
+data "vault_kv_secret_v2" "proxmox" {
+  mount = local.secret_proxmox.mount
+  name  = local.secret_proxmox.name
+}
 
-data "vault_kv_secret_v2" "instance_credentials" {
-  mount = local.secret_instance_credentials.mount
-  name  = local.secret_instance_credentials.name
+data "vault_kv_secret_v2" "instance" {
+  mount = local.secret_instance.mount
+  name  = local.secret_instance.name
 }
 
 locals {
-  # i am treating this as nonsensitive since bootstrapping this machine is for testing i want to see
-  # all output locally to validate the process and not have to ssh into each time
-  instance_credentials = nonsensitive(jsondecode(data.vault_kv_secret_v2.instance_credentials.data_json))
+  credentials_proxmox  = jsondecode(data.vault_kv_secret_v2.proxmox.data_json)
+  credentials_instance = nonsensitive(jsondecode(data.vault_kv_secret_v2.instance.data_json))
 }
